@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekomendasi Prodi - Kompas Kampus</title>
+    
+    <!-- Same dependencies as dashboard -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/rekprodi.css">
+
+    <!-- Same styles as dashboard -->
+    <style>
+        
+    </style>
+</head>
+<body x-data="{ sidebarOpen: true, selectedFaculty: null, faculties: [ { name: 'Fakultas Bisnis dan Ekonomika', icon: 'fa-chart-line', programs: [ { name: 'Akuntansi Perpajakan', degree: 'S.Tr.Ak', type: 'Sarjana Terapan', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Analisis Keuangan', degree: 'S.Tr.E.', type: 'Sarjana Terapan', accreditation: 'A', requirement: 'IPA/IPS' }, { name: 'Bisnis Digital', degree: 'S.Tr.Bns.', type: 'Sarjana Terapan', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Akuntansi', degree: 'S.Ak.', type: 'Sarjana', accreditation: 'Unggul; ACCA', requirement: 'IPA/IPS' }, { name: 'Manajemen', degree: 'S.M.', type: 'Sarjana', accreditation: 'Unggul; ABEST21', requirement: 'IPA/IPS' }, { name: 'Ekonomi Pembangunan', degree: 'S.E.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Manajemen', degree: 'M.M.', type: 'Magister', accreditation: 'Unggul; ABEST21' }, { name: 'Akuntansi', degree: 'M.Ak.', type: 'Magister', accreditation: 'Unggul' }, { name: 'Ilmu Ekonomi', degree: 'M.Ek.', type: 'Magister', accreditation: 'Unggul' }, { name: 'Ilmu Ekonomi', degree: 'Dr.', type: 'Doktor', accreditation: 'Baik Sekali' }, { name: 'Manajemen', degree: 'Dr.', type: 'Doktor', accreditation: 'Baik Sekali' } ] }, { name: 'Fakultas Hukum', icon: 'fa-scale-balanced', programs: [ { name: 'Hukum', degree: 'S.H.', type: 'Sarjana', accreditation: 'Unggul; FIBAA', requirement: 'IPA/IPS' }, { name: 'Hukum Bisnis', degree: 'S.H.', type: 'Sarjana', accreditation: 'Baik', requirement: 'IPA/IPS' }, { name: 'Hukum', degree: 'M.H.', type: 'Magister', accreditation: 'Unggul; FIBAA' }, { name: 'Kenotariatan', degree: 'M.Kn.', type: 'Magister', accreditation: 'Unggul; FIBAA' }, { name: 'Hukum', degree: 'Dr.', type: 'Doktor', accreditation: 'Unggul; FIBAA' } ] }, { name: 'Fakultas Psikologi dan Ilmu Sosial Budaya', icon: 'fa-brain', programs: [ { name: 'Psikologi', degree: 'S.Psi.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Ilmu Komunikasi', degree: 'S.I.Kom.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Hubungan Internasional', degree: 'S.Hub.Int.', type: 'Sarjana', accreditation: 'B', requirement: 'IPA/IPS' }, { name: 'Pendidikan Bahasa Inggris', degree: 'S.Pd.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Psikologi', degree: 'M.Psi.', type: 'Magister', accreditation: 'B' }, { name: 'Psikolog', degree: 'Psikolog', type: 'Profesi', accreditation: 'B', requirement: 'IPA' } ] }, { name: 'Fakultas Teknologi Industri', icon: 'fa-industry', programs: [ { name: 'Teknik Industri', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA' }, { name: 'Teknik Kimia', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Teknik Elektro', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul; IABEE', requirement: 'IPA' }, { name: 'Informatika', degree: 'S.Kom.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA' }, { name: 'Informatika PJJ', degree: 'S.Kom.', type: 'Sarjana', accreditation: 'Baik', requirement: 'IPA' }, { name: 'Teknik Mesin', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul; IABEE', requirement: 'IPA/IPS' }, { name: 'Rekayasa Tekstil', degree: 'S.T.', type: 'Sarjana', accreditation: 'Baik', requirement: 'IPA/IPS' }, { name: 'Rekayasa Elektro', degree: 'M.T.', type: 'Magister', accreditation: 'Baik' }, { name: 'Teknik Industri', degree: 'M.T.', type: 'Magister', accreditation: 'Unggul' }, { name: 'Teknik Kimia', degree: 'M.T.', type: 'Magister', accreditation: 'Minimum' }, { name: 'Informatika', degree: 'M.Kom.', type: 'Magister', accreditation: 'Unggul' }, { name: 'Rekayasa Industri', degree: 'Dr.', type: 'Doktor', accreditation: 'Baik' } ] }, { name: 'Fakultas Teknik Sipil dan Perencanaan', icon: 'fa-building', programs: [ { name: 'Teknik Sipil', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul; IABEE', requirement: 'IPA' }, { name: 'Arsitektur', degree: 'S.Ars.', type: 'Sarjana', accreditation: 'Unggul; KAAB', requirement: 'IPA/IPS' }, { name: 'Teknik Lingkungan', degree: 'S.T.', type: 'Sarjana', accreditation: 'Unggul; IABEE', requirement: 'IPA' }, { name: 'Arsitek', degree: 'Ar.', type: 'Profesi', accreditation: 'Unggul; KAAB' }, { name: 'Arsitektur', degree: 'M.Ars.', type: 'Magister', accreditation: 'Baik Sekali' }, { name: 'Teknik Lingkungan', degree: 'M.T.', type: 'Magister', accreditation: 'Baik' }, { name: 'Teknik Sipil', degree: 'M.T.', type: 'Magister', accreditation: 'B' }, { name: 'Teknik Sipil', degree: 'Dr.', type: 'Doktor', accreditation: 'Baik' } ] }, { name: 'Fakultas MIPA', icon: 'fa-flask', programs: [ { name: 'Analisis Kimia', degree: 'A.Md.Si.', type: 'Diploma Tiga', accreditation: 'Unggul; ASIIN', requirement: 'IPA/IPS' }, { name: 'Kimia', degree: 'S.Si.', type: 'Sarjana', accreditation: 'Unggul; RSC; ASIIN', requirement: 'IPA/IPS' }, { name: 'Farmasi', degree: 'S.Farm.', type: 'Sarjana', accreditation: 'Unggul; ASIIN', requirement: 'IPA' }, { name: 'Statistika', degree: 'S.Stat.', type: 'Sarjana', accreditation: 'Unggul; ASIIN', requirement: 'IPA' }, { name: 'Pendidikan Kimia', degree: 'S.Pd.', type: 'Sarjana', accreditation: 'Baik Sekali; ASIIN', requirement: 'IPA/IPS' }, { name: 'Apoteker', degree: 'Apt.', type: 'Profesi', accreditation: 'Unggul' }, { name: 'Kimia', degree: 'M.Si.', type: 'Magister', accreditation: 'Unggul; ASIIN; RSC' }, { name: 'Statistika', degree: 'M.Stat.', type: 'Magister', accreditation: 'Baik' }, { name: 'Farmasi', degree: 'M.Farm.', type: 'Magister', accreditation: 'Unggul' } ] }, { name: 'Fakultas Kedokteran', icon: 'fa-hospital', programs: [ { name: 'Kedokteran', degree: 'S.Ked.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA' }, { name: 'Dokter', degree: 'dr.', type: 'Profesi', accreditation: 'Unggul' }, { name: 'Kesehatan Masyarakat', degree: 'M.K.M.', type: 'Magister', accreditation: 'Baik' } ] }, { name: 'Fakultas Ilmu Agama Islam', icon: 'fa-mosque', programs: [ { name: 'Hukum Keluarga (Ahwal Syakhshiyah)', degree: 'S.H.', type: 'Sarjana', accreditation: 'Unggul', requirement: 'IPA/IPS' }, { name: 'Ekonomi Islam', degree: 'S.E.', type: 'Sarjana', accreditation: 'Unggul; AUN-QA', requirement: 'IPA/IPS' }, { name: 'Pendidikan Agama Islam', degree: 'S.Pd.', type: 'Sarjana', accreditation: 'A; AUN-QA', requirement: 'IPA/IPS' }, { name: 'Ilmu Agama Islam', degree: 'M.Ag.', type: 'Magister', accreditation: 'A' }, { name: 'Hukum Islam', degree: 'Dr.', type: 'Doktor', accreditation: 'Baik Sekali' } ] } ]}" x-cloak>
+    <!-- Header -->
+    <header class="fixed w-full bg-white shadow-lg z-50">
+        <div class="flex justify-between items-center px-6 py-3">
+            <div class="flex items-center space-x-4">
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center">
+                    <img src="logohet.jpg" alt="Logo" class="h-12 w-auto">
+                    <span class="ml-3 text-xl font-bold">
+                        <span class="text-blue-600">Kompas</span>
+                        <span style="color: #ffff00">Kampus</span>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="#" class="text-gray-700 hover:text-blue-600">Home</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">About Us</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">News</a>
+            </nav>
+
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <div class="relative" x-data="{ isOpen: false }" @click.away="isOpen = false">
+                    <button @click="isOpen = !isOpen" 
+                            class="flex items-center space-x-3 bg-white p-2 rounded-lg hover:bg-gray-50">
+                        <img src="avatar.jpg" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-500">
+                        <div class="hidden md:block text-left">
+                            <p class="font-semibold text-gray-800">John Doe</p>
+                            <p class="text-sm text-gray-500">Student</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div x-show="isOpen" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         @click.away="isOpen = false"
+                         class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <p class="font-semibold text-gray-800">John Doe</p>
+                            <p class="text-sm text-gray-500">john.doe@email.com</p>
+                        </div>
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                            <i class="fas fa-user-circle text-gray-600"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                            <i class="fas fa-cog text-gray-600"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar with updated active state -->
+    <aside class="sidebar-nav fixed left-0 top-0 h-full shadow-lg pt-20 bg-white/80" 
+           :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
+        <nav class="p-4 space-y-2">
+            <a href="dash.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300">
+                <i class="fas fa-home text-gray-600"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="latsol.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300">
+                <i class="fas fa-book text-gray-600"></i>
+                <span>Latihan Soal</span>
+            </a>
+            <a href="rekprodi.html" class="flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                <i class="fas fa-chart-pie"></i>
+                <span>Rekomendasi Prodi</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300">
+                <i class="fas fa-university text-gray-600"></i>
+                <span>Info Prodi</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300">
+                <i class="fas fa-graduation-cap text-gray-600"></i>
+                <span>Info Beasiswa</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-all duration-300">
+                <i class="fas fa-comment text-gray-600"></i>
+                <span>Feedback</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content pt-20 p-6">
+        <!-- Hero Section - Modernized -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 mb-12">
+            <div class="absolute inset-0 bg-pattern opacity-10"></div>
+            <div class="relative px-8 py-16 md:py-24">
+                <div class="max-w-7xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                        <div class="space-y-8">
+                            <span class="inline-block px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium">
+                                Temukan Potensimu
+                            </span>
+                            <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight">
+                                Mulai Perjalanan Akademikmu dengan Tepat
+                            </h1>
+                            <p class="text-lg text-indigo-100">
+                                Gunakan alat analisis berbasis AI kami untuk menemukan program studi yang paling sesuai dengan minat dan bakatmu.
+                            </p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="#tests" class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-colors">
+                                    <i class="fas fa-play-circle mr-2"></i>
+                                    Mulai Tes
+                                </a>
+                                <a href="#info" class="inline-flex items-center px-6 py-3 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition-colors">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Pelajari Lebih Lanjut
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden md:block relative">
+                            <img src="hero-illustration.svg" alt="Education Illustration" class="floating-card w-full max-w-lg mx-auto">
+                            <!-- Add floating elements -->
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                            <div class="absolute bottom-0 left-0 w-20 h-20 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section - Enhanced -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-glass rounded-2xl p-6 card-hover animate-fade-up" style="animation-delay: 100ms">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                        <i class="fas fa-university text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline">
+                            <h4 class="text-3xl font-bold text-blue-600">8+</h4>
+                            <span class="ml-1 text-blue-500">Fakultas</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">Pilihan Beragam</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <i class="fas fa-graduation-cap text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-gray-800">50+</h4>
+                        <p class="text-gray-600">Program Studi</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <i class="fas fa-award text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-gray-800">90%</h4>
+                        <p class="text-gray-600">Akreditasi Unggul</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <i class="fas fa-users text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-gray-800">10k+</h4>
+                        <p class="text-gray-600">Alumni Sukses</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Section - Modernized -->
+        <section class="mb-16 py-12 bg-glass rounded-3xl" id="info">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <span class="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+                        Cara Kerja
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Proses Yang Simpel</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                        Ikuti langkah-langkah sederhana ini untuk menemukan program studi yang tepat untukmu
+                    </p>
+                </div>
+                
+                <!-- Process Steps - Enhanced visual hierarchy -->
+                <div class="relative">
+                    <div class="hidden lg:block absolute left-1/2 top-0 w-0.5 h-full bg-gradient-to-b from-indigo-600 to-purple-600 transform -translate-x-1/2"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+                        <!-- Step 1 -->
+                        <div class="md:text-right md:pr-12">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <div class="flex items-center md:justify-end space-x-4">
+                                    <div class="p-3 bg-blue-100 rounded-full">
+                                        <span class="text-blue-600 font-bold">01</span>
+                                    </div>
+                                    <h3 class="font-semibold text-lg">Pilih Tes Minat Bakat</h3>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    Mulai dengan memilih tes yang sesuai untuk mengukur potensi dan minatmu.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="md:hidden h-8"></div>
+
+                        <!-- Step 2 -->
+                        <div class="md:pl-12">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-3 bg-purple-100 rounded-full">
+                                        <span class="text-purple-600 font-bold">02</span>
+                                    </div>
+                                    <h3 class="font-semibold text-lg">Ikuti Tes</h3>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    Jawab pertanyaan dengan jujur untuk mendapatkan hasil yang akurat.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="md:hidden h-8"></div>
+
+                        <!-- Step 3 -->
+                        <div class="md:text-right md:pr-12">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <div class="flex items-center md:justify-end space-x-4">
+                                    <div class="p-3 bg-green-100 rounded-full">
+                                        <span class="text-green-600 font-bold">03</span>
+                                    </div>
+                                    <h3 class="font-semibold text-lg">Analisis Hasil</h3>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    Dapatkan analisis mendalam tentang potensi dan rekomendasi program studi.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="md:hidden h-8"></div>
+
+                        <!-- Step 4 -->
+                        <div class="md:pl-12">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-3 bg-yellow-100 rounded-full">
+                                        <span class="text-yellow-600 font-bold">04</span>
+                                    </div>
+                                    <h3 class="font-semibold text-lg">Konsultasi</h3>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    Diskusikan hasil tes dengan konselor akademik untuk panduan lebih lanjut.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Options Section - Enhanced -->
+        <section class="mb-16" id="tests">
+            <div class="text-center mb-12">
+                <span class="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+                    Tes Tersedia
+                </span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Pilih Tesmu</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    Setiap tes dirancang untuk mengukur aspek berbeda dari potensimu
+                </p>
+            </div>
+
+            <!-- Enhanced Test Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- RIASEC Test Card -->
+                <div class="group relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 flex flex-col h-[500px]">
+                    <div class="absolute right-4 top-4 z-10">
+                        <span class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold text-sm">
+                            <i class="fas fa-fire mr-2"></i>
+                            Populer!
+                        </span>
+                    </div>
+                    <div class="h-52 overflow-hidden">
+                        <img src="riasec-banner.jpg" alt="RIASEC Test" 
+                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">
+                                Tes RIASEC (Minat Bakat)
+                            </h3>
+                            <p class="text-gray-600">
+                                Temukan minat dan bakatmu melalui tes RIASEC yang akan membantu menentukan jurusan kuliah yang sesuai dengan kepribadianmu.
+                            </p>
+                        </div>
+                        <div class="mt-auto pt-6">
+                            <a href="minatbakat.html" class="block w-full text-center py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold">
+                                Mulai Tes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Style Test Card -->
+                <div class="group relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 flex flex-col h-[500px]">
+                    <div class="absolute right-4 top-4 z-10">
+                        <span class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 text-white font-semibold text-sm">
+                            <i class="fas fa-star mr-2"></i>
+                            Baru!
+                        </span>
+                    </div>
+                    <div class="h-52 overflow-hidden">
+                        <img src="learning-style-banner.jpg" alt="Learning Style Test" 
+                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 to-yellow-800">
+                                Tes Gaya Belajar
+                            </h3>
+                            <p class="text-gray-600">
+                                Kenali gaya belajarmu untuk memaksimalkan potensi akademik dan menemukan metode belajar yang paling efektif.
+                            </p>
+                        </div>
+                        <div class="mt-auto pt-6">
+                            <a href="learning-style.html" class="block w-full text-center py-3 px-6 bg-gradient-to-r from-yellow-600 to-yellow-800 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold">
+                                Mulai Tes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MBTI Test Card -->
+                <div class="group relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 flex flex-col h-[500px]">
+                    <div class="absolute right-4 top-4 z-10">
+                        <span class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold text-sm">
+                            <i class="fas fa-star mr-2"></i>
+                            Baru!
+                        </span>
+                    </div>
+                    <div class="h-52 overflow-hidden">
+                        <img src="mbti-banner.jpg" alt="MBTI Test" 
+                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-800">
+                                Tes MBTI (16 Personalities)
+                            </h3>
+                            <p class="text-gray-600">
+                                Temukan kepribadianmu melalui tes MBTI yang akan membantu menentukan jurusan kuliah yang sesuai dengan karakteristikmu.
+                            </p>
+                        </div>
+                        <div class="mt-auto pt-6">
+                            <a href="mbti.html" class="block w-full text-center py-3 px-6 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold">
+                                Mulai Tes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Features Section -->
+        <section class="mb-16 py-12 bg-glass rounded-3xl">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <span class="text-indigo-600 font-semibold">Fitur Unggulan</span>
+                    <h2 class="text-3xl font-bold mt-2">Kenapa Memilih Kami?</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="p-3 bg-blue-100 rounded-full w-fit mb-4">
+                            <i class="fas fa-chart-bar text-blue-600 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-3">Analisis Komprehensif</h3>
+                        <p class="text-gray-600">
+                            Dapatkan analisis mendalam tentang minat, bakat, dan potensi akademikmu.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="p-3 bg-purple-100 rounded-full w-fit mb-4">
+                            <i class="fas fa-brain text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-3">AI-Powered</h3>
+                        <p class="text-gray-600">
+                            Menggunakan teknologi AI untuk memberikan rekomendasi yang lebih akurat.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="p-3 bg-green-100 rounded-full w-fit mb-4">
+                            <i class="fas fa-user-graduate text-green-600 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-3">Konseling Profesional</h3>
+                        <p class="text-gray-600">
+                            Konsultasikan hasil tes dengan konselor akademik berpengalaman.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="mb-16">
+            <div class="text-center mb-12">
+                <span class="text-indigo-600 font-semibold">FAQ</span>
+                <h2 class="text-3xl font-bold mt-2">Pertanyaan Umum</h2>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-4" x-data="{ active: null }">
+                <!-- FAQ Items -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <button @click="active = active === 1 ? null : 1" 
+                            class="w-full px-6 py-4 text-left flex justify-between items-center">
+                        <span class="font-semibold">Berapa lama waktu pengerjaan tes?</span>
+                        <i class="fas" :class="active === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="active === 1" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform -translate-y-2"
+                         x-transition:enter-end="opacity-100 transform translate-y-0"
+                         class="px-6 pb-4">
+                        <p class="text
+</body>
+</html>
+
+<!-- Add this script section for enhanced animations -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add intersection observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-up');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.card-hover').forEach(el => observer.observe(el));
+
+    // Add smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+</script>
+

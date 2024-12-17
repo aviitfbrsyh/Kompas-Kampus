@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assessment - Kompas Kampus</title>
+    
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="questions-data.js"></script>
+    <link rel="stylesheet" href="css/assesment.css">
+    
+    <style>
+        
+    </style>
+</head>
+<body x-data="assessment()" class="bg-gray-50">
+
+    <!-- Replace the existing back button with this updated version -->
+<a href="dash.html" 
+   x-show="currentStep === 'results'"
+   x-transition:enter="transition ease-out duration-300"
+   x-transition:enter-start="opacity-0 transform -translate-y-4"
+   x-transition:enter-end="opacity-100 transform translate-y-0"
+   class="fixed top-6 left-6 z-40 flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg hover:bg-white transition-all duration-300 border border-gray-200">
+    <i class="fas fa-arrow-left text-indigo-600"></i>
+    <span class="text-indigo-600 font-medium">Kembali ke Beranda</span>
+</a>
+
+<!-- ...rest of the existing code... -->
+
+    <!-- Add this right after the <body> tag -->
+    <div x-show="isDownloading" 
+         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-6 shadow-xl max-w-sm w-full mx-4">
+            <div class="flex items-center space-x-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+                <div>
+                    <h3 class="font-semibold text-lg">Downloading PDF</h3>
+                    <p class="text-gray-600 text-sm">Please wait while we generate your report...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header - Keep consistent with other pages -->
+    <!-- ...existing header code... -->
+
+    <main class="min-h-screen pt-20 p-6">
+        <!-- Welcome Screen -->
+        <div x-show="currentStep === 'welcome'" class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
+                    <h1 class="text-3xl font-bold mb-4">AI-Powered Career Assessment</h1>
+                    <p class="text-lg opacity-90">Temukan potensi dan jalur karier terbaikmu melalui analisis AI yang komprehensif</p>
+                </div>
+                
+                <div class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-indigo-100 rounded-lg">
+                                    <i class="fas fa-brain text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Analisis Mendalam</h3>
+                                    <p class="text-sm text-gray-600">Menggunakan machine learning untuk menganalisis 16 aspek kepribadian</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-purple-100 rounded-lg">
+                                    <i class="fas fa-chart-line text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">95% Akurasi</h3>
+                                    <p class="text-sm text-gray-600">Hasil yang telah divalidasi dengan riset akademik</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <i class="fas fa-clock text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">15 Menit</h3>
+                                    <p class="text-sm text-gray-600">Waktu yang dibutuhkan untuk menyelesaikan assessment</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-green-100 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Hasil Instan</h3>
+                                    <p class="text-sm text-gray-600">Dapatkan rekomendasi program studi secara real-time</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-8">
+                        <button @click="startAssessment()" 
+                                class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                            Mulai Assessment
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">
+                            Dengan melanjutkan, kamu menyetujui <a href="#" class="text-indigo-600">Ketentuan Layanan</a> kami
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Screen -->
+        <div x-show="currentStep === 'assessment'" 
+             x-transition:enter="fade-enter"
+             x-transition:enter-start="fade-enter"
+             x-transition:enter-end="fade-enter-active"
+             class="max-w-4xl mx-auto">
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <!-- AI Assistant Floating Button -->
+                <button @click="toggleAIHelper()" 
+                        class="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full pulse-effect">
+                    <i class="fas fa-robot text-xl"></i>
+                </button>
+
+                <!-- AI Helper Dialog -->
+                <div x-show="showAIHelper" 
+                     class="fixed bottom-24 right-6 w-80 bg-white rounded-xl shadow-2xl p-4">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-robot text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">AI Assistant</h4>
+                            <p class="text-sm text-gray-500">Here to help!</p>
+                        </div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <p class="text-sm text-gray-600 mb-3">Need help understanding the question?</p>
+                        <button @click="getAIExplanation()" 
+                                class="w-full bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm hover:bg-indigo-100">
+                            Get AI Explanation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Section -->
+                <div class="mb-8">
+                    <!-- Progress Bar -->
+                    <div class="mb-8">
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span>Progress</span>
+                            <span x-text="`Question ${currentQuestion + 1} of ${questions.length}`"></span>
+                        </div>
+                        <div class="h-2 rounded-full bg-gray-200">
+                            <div class="h-full rounded-full bg-indigo-600 transition-all duration-300"
+                                 :style="`width: ${((currentQuestion + 1) / questions.length) * 100}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Question Display -->
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-semibold" x-text="currentQuestionData.text"></h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <template x-for="option in currentQuestionData.options" :key="option.id">
+                                <button @click="selectAnswer(option)"
+                                        :class="{
+                                            'border-indigo-600 bg-indigo-50': selectedAnswer === option,
+                                            'border-gray-200 hover:border-indigo-600 hover:bg-indigo-50': selectedAnswer !== option
+                                        }"
+                                        class="p-6 border-2 rounded-xl transition-all duration-300">
+                                    <div class="flex items-center space-x-3">
+                                        <div :class="{'bg-indigo-600': selectedAnswer === option, 'bg-gray-200': selectedAnswer !== option}"
+                                             class="w-4 h-4 rounded-full transition-colors"></div>
+                                        <span x-text="option.text"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                    <button @click="previousQuestion()" 
+                            x-show="currentQuestionIndex > 0"
+                            class="px-6 py-2 text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50">
+                        Previous
+                    </button>
+                    <button @click="nextQuestion()" 
+                            :disabled="!selectedAnswer"
+                            :class="{'opacity-50 cursor-not-allowed': !selectedAnswer}"
+                            class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analyzing Screen -->
+        <div x-show="currentStep === 'analyzing'" 
+             class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl p-8 ai-processing">
+                <div class="animate-pulse text-center">
+                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-brain text-4xl text-indigo-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-4 text-white">AI sedang menganalisis jawabanmu</h2>
+                    <div class="flex justify-center items-center space-x-2">
+                        <div class="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+                        <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
+                    <p class="text-white mt-4">Mohon tunggu sebentar...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div x-show="currentStep === 'results'" class="max-w-6xl mx-auto space-y-8">
+    <!-- AI Analysis Header -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden" id="report-section">
+        <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 p-8">
+            <div class="flex justify-between items-start">
+                <div class="text-white">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <span class="px-3 py-1 bg-white/10 rounded-full text-sm flex items-center">
+                            <i class="fas fa-robot mr-2"></i>
+                            AI Analysis Report
+                        </span>
+                        <span class="px-3 py-1 bg-white/10 rounded-full text-sm flex items-center">
+                            <i class="fas fa-chart-pie mr-2"></i>
+                            Score: 95%
+                        </span>
+                    </div>
+                    <h2 class="text-3xl font-bold mt-4">Hasil Analisis Potensi Akademik</h2>
+                    <p class="mt-2 opacity-90">Berdasarkan analisis AI terhadap 16 aspek kepribadian dan minat</p>
+                </div>
+                <div class="flex items-center space-x-3"> <!-- Added container for buttons -->
+            <button @click="downloadPDF()" 
+                    class="flex items-center space-x-2 text-white bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20">
+                <i class="fas fa-download"></i>
+                <span>Download PDF</span>
+            </button>
+        </div>
+            </div>
+        </div>
+
+        <!-- Analysis Content Grid -->
+        <div class="p-8 grid grid-cols-12 gap-8">
+            <!-- Left Column - Main Analysis -->
+            <div class="col-span-12 lg:col-span-8 space-y-8">
+                <!-- Personality Profile -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="p-3 bg-white rounded-xl shadow-sm">
+                            <i class="fas fa-user-circle text-indigo-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">The Analyst</h3>
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <span class="px-2 py-1 bg-white rounded-full text-sm">Logis</span>
+                                <span class="px-2 py-1 bg-white rounded-full text-sm">Analitis</span>
+                                <span class="px-2 py-1 bg-white rounded-full text-sm">Sistematis</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 leading-relaxed">
+                        Berdasarkan analisis AI, kamu memiliki kecenderungan kuat pada pemikiran logis dan analitis. 
+                        Kemampuanmu dalam memecahkan masalah kompleks sangat menonjol.
+                    </p>
+                </div>
+
+                <!-- Program Recommendations -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-graduation-cap mr-3 text-indigo-600"></i>
+                        Rekomendasi Program Studi
+                    </h3>
+                    
+                    <!-- Program Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Template for each program -->
+                        <template x-for="program in analysisResult.recommendations.programs">
+                            <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-all">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="p-2 bg-indigo-100 rounded-lg mt-1">
+                                            <i class="fas fa-laptop-code text-indigo-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900" x-text="program.name"></h4>
+                                            <div class="flex items-center space-x-2 mt-1">
+                                                <div class="flex items-center">
+                                                    <div class="h-2 w-20 bg-gray-200 rounded-full">
+                                                        <div class="h-2 bg-green-500 rounded-full"
+                                                             :style="`width: ${program.match}%`"></div>
+                                                    </div>
+                                                    <span class="ml-2 text-sm text-gray-600" x-text="`${program.match}% Match`"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full" 
+                                          x-show="program.match >= 90">Best Match</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Skills & Insights -->
+            <div class="col-span-12 lg:col-span-4 space-y-8">
+                <!-- Skill Analysis -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-chart-bar mr-2 text-purple-600"></i>
+                        Analisis Kemampuan
+                    </h3>
+                    <div class="space-y-4">
+                        <template x-for="(score, skill) in analysisResult.traits">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span x-text="skill"></span>
+                                    <span class="font-medium" x-text="`${score}%`"></span>
+                                </div>
+                                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-all duration-500"
+                                         :style="`width: ${score}%`"></div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Career Projection -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold mb-4">Career Path Projection</h3>
+                    <canvas id="careerProjectionChart" class="w-full"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- ... existing action cards ... -->
+    </div>
+</div>
+
+        <!-- AI Insight Cards -->
+        <div x-show="currentStep === 'results'" class="space-y-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- AI Confidence Score -->
+        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                    <i class="fas fa-brain text-blue-600"></i>
+                </div>
+                <h3 class="font-semibold">AI Confidence Score</h3>
+            </div>
+            <div class="relative">
+                <div class="text-3xl font-bold text-blue-600 mb-2">95%</div>
+                <div class="h-2 bg-gray-200 rounded-full mb-3">
+                    <div class="h-full w-[95%] bg-blue-600 rounded-full"></div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Data Points Analyzed</span>
+                        <span class="font-medium">1,420</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Response Consistency</span>
+                        <span class="font-medium">98%</</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Pattern Reliability</span>
+                        <span class="font-medium">92%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Pattern Recognition -->
+        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2 bg-purple-100 rounded-lg">
+                    <i class="fas fa-chart-line text-purple-600"></i>
+                </div>
+                <h3 class="font-semibold">Pattern Recognition</h3>
+            </div>
+            <canvas id="patternChart" class="w-full h-32 mb-3"></canvas>
+            <div class="text-sm text-gray-600">
+                Identified patterns across multiple assessment dimensions
+            </div>
+        </div>
+
+        <!-- Decision Confidence -->
+        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="p-2 bg-green-100 rounded-lg">
+                    <i class="fas fa-check-circle text-green-600"></i>
+                </div>
+                <h3 class="font-semibold">Decision Confidence</h3>
+            </div>
+            <div id="confidenceChart" class="w-full h-32 mb-3"></div>
+            <div class="text-sm text-gray-600">
+                Confidence level per career recommendation
+            </div>
+        </div>
+    </div>
+
+    <!-- Career Projection -->
+    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+        <h3 class="text-xl font-semibold mb-6 flex items-center">
+            <i class="fas fa-road text-indigo-600 mr-2"></i>
+            Proyeksi Karir
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="h-64"> <!-- Fixed height container -->
+                <canvas id="careerPathChart" class="w-full h-full"></canvas>
+                <div class="text-sm text-gray-600 text-center mt-2">
+                    Proyeksi pertumbuhan karir dalam 10 tahun
+                </div>
+            </div>
+            <!-- Replace the existing milestone section with this -->
+<div class="space-y-6">
+    <h4 class="text-lg font-semibold mb-6 flex items-center">
+        <i class="fas fa-flag text-indigo-600 mr-2"></i>
+        Milestone Karir
+    </h4>
+    
+    <!-- Timeline Container -->
+    <div class="relative space-y-8 before:content-[''] before:absolute before:left-4 before:top-0 before:w-0.5 before:h-full before:bg-indigo-100">
+        <!-- Entry Level -->
+        <div class="relative pl-12">
+            <div class="absolute left-2 top-1 w-4 h-4 rounded-full bg-indigo-600 border-4 border-indigo-50"></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-1">
+                    <h5 class="font-semibold text-indigo-600">Entry Level Position</h5>
+                    <span class="text-sm bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full">1-2 tahun</span>
+                </div>
+                <p class="text-gray-600">Junior Developer / Data Analyst</p>
+                <div class="mt-2 text-sm text-gray-500">
+                    Memulai karir sebagai programmer junior atau analis data dengan fokus pada pengembangan keterampilan teknis dasar.
+                </div>
+            </div>
+        </div>
+
+        <!-- Mid Level -->
+        <div class="relative pl-12">
+            <div class="absolute left-2 top-1 w-4 h-4 rounded-full bg-indigo-500 border-4 border-indigo-50"></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-1">
+                    <h5 class="font-semibold text-indigo-600">Mid-Level Specialist</h5>
+                    <span class="text-sm bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full">3-5 tahun</span>
+                </div>
+                <p class="text-gray-600">Senior Developer / Data Scientist</p>
+                <div class="mt-2 text-sm text-gray-500">
+                    Berkembang menjadi spesialis dengan keahlian mendalam dalam bidang pengembangan software atau data science.
+                </div>
+            </div>
+        </div>
+
+        <!-- Leadership -->
+        <div class="relative pl-12">
+            <div class="absolute left-2 top-1 w-4 h-4 rounded-full bg-indigo-400 border-4 border-indigo-50"></div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-1">
+                    <h5 class="font-semibold text-indigo-600">Leadership Role</h5>
+                    <span class="text-sm bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full">5-8 tahun</span>
+                </div>
+                <p class="text-gray-600">Tech Lead / Project Manager</p>
+                <div class="mt-2 text-sm text-gray-500">
+                    Memimpin tim teknis dan mengelola proyek-proyek besar dengan tanggung jawab strategis.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl p-6 shadow-lg">
+                <h4 class="text-lg font-semibold mb-4">Salary Growth Projection</h4>
+                <div id="careerGrowthChart"></div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-lg">
+                <h4 class="text-lg font-semibold mb-4">Skills Development Timeline</h4>
+                <div id="skillsTimeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skill Development Plan -->
+    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+        <h3 class="text-xl font-semibold mb-6 flex items-center">
+            <i class="fas fa-laptop-code text-indigo-600 mr-2"></i>
+            Rencana Pengembangan Skill
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Technical Skills -->
+            <div class="space-y-4">
+                <h4 class="font-medium text-gray-800">Technical Skills</h4>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Programming</span>
+                            <span class="text-indigo-600">High Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-3/4 bg-indigo-600 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Data Analysis</span>
+                            <span class="text-indigo-600">Medium Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-1/2 bg-indigo-600 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soft Skills -->
+            <div class="space-y-4">
+                <h4 class="font-medium text-gray-800">Soft Skills</h4>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Leadership</span>
+                            <span class="text-purple-600">High Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-2/3 bg-purple-600 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Communication</span>
+                            <span class="text-purple-600">High Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-4/5 bg-purple-600 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Industry Knowledge -->
+            <div class="space-y-4">
+                <h4 class="font-medium text-gray-800">Industry Knowledge</h4>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Tech Trends</span>
+                            <span class="text-blue-600">Medium Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-2/3 bg-blue-600 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Business Acumen</span>
+                            <span class="text-blue-600">High Priority</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full">
+                            <div class="h-full w-1/2 bg-blue-600 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/80 backdrop-blur-md shadow-lg mt-8 py-8 px-8">
+        <!-- ...existing footer code... -->
+    </footer>
+
+    <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('assessment', () => ({
+        currentStep: 'welcome',
+        currentQuestion: 0,
+        questions: [
+            {
+                id: 1,
+                text: "Bagaimana cara Anda menyelesaikan masalah kompleks?",
+                options: [
+                    { id: 'a1', text: "Menganalisis secara sistematis", traits: { analytical: 5, methodical: 4 } },
+                    { id: 'a2', text: "Mencari solusi kreatif", traits: { creative: 5, innovative: 4 } },
+                    { id: 'a3', text: "Berdiskusi dengan orang lain", traits: { social: 5, collaborative: 4 } }
+                ]
+            },
+            // ... more questions
+        ],
+        selectedAnswer: null,
+        answers: [],
+        analysisResult: null,
+        isDownloading: false,
+
+        init() {
+            this.currentQuestionData = this.questions[0];
+        },
+
+        startAssessment() {
+            this.currentStep = 'assessment';
+            this.currentQuestion = 0;
+            this.selectedAnswer = null;
+            this.answers = [];
+        },
+
+        selectAnswer(option) {
+            this.selectedAnswer = option;
+        },
+
+        async nextQuestion() {
+            if (!this.selectedAnswer) return;
+
+            // Save answer
+            this.answers.push({
+                questionId: this.currentQuestion + 1,
+                answer: this.selectedAnswer
+            });
+
+            if (this.currentQuestion < this.questions.length - 1) {
+                this.currentQuestion++;
+                this.currentQuestionData = this.questions[this.currentQuestion];
+                this.selectedAnswer = null;
+            } else {
+                await this.completeAssessment();
+            }
+        },
+
+        previousQuestion() {
+            if (this.currentQuestion > 0) {
+                this.currentQuestion--;
+                this.answers.pop();
+                this.currentQuestionData = this.questions[this.currentQuestion];
+                this.selectedAnswer = null;
+            }
+        },
+
+        async completeAssessment() {
+            this.currentStep = 'analyzing';
+            
+            // Calculate traits based on answers
+            const traits = {};
+            this.answers.forEach(answer => {
+                Object.entries(answer.answer.traits).forEach(([trait, value]) => {
+                    traits[trait] = (traits[trait] || 0) + value;
+                });
+            });
+
+            // Simulate AI analysis
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Generate analysis result
+            this.analysisResult = {
+                personalityType: this.determinePersonalityType(traits),
+                traits: this.normalizeTraits(traits),
+                recommendations: this.generateRecommendations(traits)
+            };
+
+            this.currentStep = 'results';
+            this.$nextTick(() => this.renderCharts());
+        },
+
+        determinePersonalityType(traits) {
+            const topTraits = Object.entries(traits)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 3)
+                .map(([trait]) => trait);
+
+            const personalityTypes = {
+                analytical: "The Analyst",
+                creative: "The Innovator",
+                social: "The Communicator",
+                methodical: "The Strategist"
+            };
+
+            return {
+                title: personalityTypes[topTraits[0]],
+                traits: topTraits
+            };
+        },
+
+        normalizeTraits(traits) {
+            const maxScore = Math.max(...Object.values(traits));
+            return Object.fromEntries(
+                Object.entries(traits).map(([trait, score]) => [
+                    trait, 
+                    Math.round((score / maxScore) * 100)
+                ])
+            );
+        },
+
+        generateRecommendations(traits) {
+            const topTrait = Object.entries(traits)
+                .sort(([,a], [,b]) => b - a)[0][0];
+
+            const recommendations = {
+                analytical: {
+                    programs: [
+                        { name: "Teknik Informatika", match: 95 },
+                        { name: "Data Science", match: 92 },
+                        { name: "Sistem Informasi", match: 88 }
+                    ]
+                },
+                creative: {
+                    programs: [
+                        { name: "Design Digital", match: 95 },
+                        { name: "Multimedia", match: 92 },
+                        { name: "Komunikasi Visual", match: 90 }
+                    ]
+                },
+                // Add more recommendations...
+            };
+
+            return recommendations[topTrait] || recommendations.analytical;
+        },
+
+        renderCharts() {
+            // Render personality radar chart
+            const ctx = document.getElementById('personalityChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: Object.keys(this.analysisResult.traits),
+                        datasets: [{
+                            label: 'Your Profile',
+                            data: Object.values(this.analysisResult.traits),
+                            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            pointBackgroundColor: 'rgba(79, 70, 229, 1)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Pattern Recognition Chart
+            const patternCtx = document.getElementById('patternChart');
+            if (patternCtx) {
+                new Chart(patternCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Pattern Confidence',
+                            data: [65, 75, 82, 85, 90, 95],
+                            borderColor: '#7C3AED',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Career Projection Chart
+            const careerCtx = document.getElementById('careerPathChart');
+            if (careerCtx) {
+                new Chart(careerCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['0', '2', '4', '6', '8', '10'],
+                        datasets: [{
+                            label: 'Career Growth',
+                            data: [40, 55, 70, 80, 90, 95],
+                            borderColor: '#4F46E5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2,  // This controls the aspect ratio
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Career Progress (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Years'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initialize Decision Confidence Chart using ApexCharts
+            const confidenceChart = new ApexCharts(document.getElementById('confidenceChart'), {
+                series: [95, 85, 75],
+                chart: {
+                    type: 'radialBar',
+                    height: 150,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -90,
+                        endAngle: 90,
+                        track: {
+                            background: "#e7e7e7",
+                            strokeWidth: '97%',
+                            margin: 5
+                        },
+                        dataLabels: {
+                            name: {
+                                show: false
+                            },
+                            value: {
+                                offsetY: -2,
+                                fontSize: '22px'
+                            }
+                        }
+                    }
+                },
+                grid: {
+                    padding: {
+                        top: -10
+                    }
+                },
+                colors: ['#4F46E5', '#7C3AED', '#2563EB'],
+                labels: ['Career Match', 'Skill Fit', 'Growth Potential']
+            });
+
+            confidenceChart.render();
+
+            // Add Career Growth Projection Chart
+            const careerGrowthChart = new ApexCharts(document.getElementById('careerGrowthChart'), {
+                series: [{
+                    name: 'Salary Potential',
+                    data: [3000, 4500, 6000, 8000, 12000, 15000]
+                }],
+                chart: {
+                    type: 'area',
+                    height: 250,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3
+                    }
+                },
+                xaxis: {
+                    categories: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6']
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                },
+                colors: ['#4F46E5']
+            });
+
+            careerGrowthChart.render();
+
+            // Add Skills Development Timeline
+            const skillsTimeline = new ApexCharts(document.getElementById('skillsTimeline'), {
+                series: [{
+                    data: [
+                        {
+                            x: 'Technical',
+                            y: [0, 3],
+                            fillColor: '#4F46E5'
+                        },
+                        {
+                            x: 'Leadership',
+                            y: [2, 4],
+                            fillColor: '#7C3AED'
+                        },
+                        {
+                            x: 'Business',
+                            y: [3, 6],
+                            fillColor: '#2563EB'
+                        }
+                    ]
+                }],
+                chart: {
+                    height: 250,
+                    type: 'rangeBar',
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true
+                    }
+                },
+                xaxis: {
+                    type: 'numeric',
+                    title: {
+                        text: 'Years of Experience'
+                    }
+                }
+            });
+
+            skillsTimeline.render();
+        },
+
+        async downloadPDF() {
+            this.isDownloading = true;
+            const downloadBtn = document.querySelector('[x-data] button[x-on\\:click="downloadPDF"]');
+            
+            if (downloadBtn) {
+                downloadBtn.style.display = 'none';
+            }
+
+            try {
+                await this.renderChartsForPDF();
+                
+                const element = document.getElementById('report-section');
+                const opts = {
+                    margin: [10, 10, 10, 10],
+                    filename: 'assessment-report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        logging: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait'
+                    }
+                };
+
+                await html2pdf().set(opts).from(element).save();
+            } catch (err) {
+                console.error('Error generating PDF:', err);
+                alert('Terjadi kesalahan saat men-download PDF. Silakan coba lagi.');
+            } finally {
+                if (downloadBtn) {
+                    downloadBtn.style.display = '';
+                }
+                this.isDownloading = false;
+            }
+        },
+
+        async renderChartsForPDF() {
+            // Create a promise that resolves when all charts are rendered
+            return new Promise(async (resolve) => {
+                // Ensure the results section includes all charts
+                const fullReportSection = document.getElementById('report-section');
+                
+                // Add charts section if not exists
+                if (!document.getElementById('pdf-charts-section')) {
+                    const chartsSection = document.createElement('div');
+                    chartsSection.id = 'pdf-charts-section';
+                    chartsSection.classList.add('p-8', 'grid', 'grid-cols-1', 'gap-8');
+                    
+                    // Template for chart sections
+                    chartsSection.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-xl p-6 shadow-lg">
+                                <h4 class="text-lg font-semibold mb-4">AI Analysis Charts</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <canvas id="pdf-pattern-chart"></canvas>
+                                    <canvas id="pdf-confidence-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 shadow-lg">
+                                <h4 class="text-lg font-semibold mb-4">Career Progression</h4>
+                                <canvas id="pdf-career-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-lg">
+                            <h4 class="text-lg font-semibold mb-4">Skills Development Timeline</h4>
+                            <div id="pdf-skills-timeline"></div>
+                        </div>
+                    `;
+                    
+                    fullReportSection.appendChild(chartsSection);
+                }
+
+                // Re-render all charts specifically for PDF
+                await this.renderPDFCharts();
+                
+                // Allow time for charts to render
+                setTimeout(resolve, 500);
+            });
+        },
+
+        async renderPDFCharts() {
+            // Pattern Recognition Chart for PDF
+            const patternCtx = document.getElementById('pdf-pattern-chart');
+            if (patternCtx) {
+                new Chart(patternCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Pattern Confidence',
+                            data: [65, 75, 82, 85, 90, 95],
+                            borderColor: '#7C3AED',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Career Progress Chart for PDF
+            const careerCtx = document.getElementById('pdf-career-chart');
+            if (careerCtx) {
+                new Chart(careerCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                        datasets: [{
+                            label: 'Career Progress',
+                            data: [40, 55, 70, 85, 95],
+                            borderColor: '#4F46E5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Skills Timeline for PDF
+            const skillsTimeline = new ApexCharts(document.getElementById('pdf-skills-timeline'), {
+                series: [{
+                    data: [
+                        {
+                            x: 'Technical',
+                            y: [0, 3],
+                            fillColor: '#4F46E5'
+                        },
+                        {
+                            x: 'Leadership',
+                            y: [2, 4],
+                            fillColor: '#7C3AED'
+                        },
+                        {
+                            x: 'Business',
+                            y: [3, 6],
+                            fillColor: '#2563EB'
+                        }
+                    ]
+                }],
+                chart: {
+                    height: 200,
+                    type: 'rangeBar'
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true
+                    }
+                },
+                xaxis: {
+                    type: 'numeric',
+                    title: {
+                        text: 'Years of Experience'
+                    }
+                }
+            });
+
+            skillsTimeline.render();
+        }
+
+    }));
+});
+</script>
+</body>
+</html>

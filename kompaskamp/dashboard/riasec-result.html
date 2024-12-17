@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Tes RIASEC - Kompas Kampus</title>
+    
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="css/riasec-result.css">
+    <style>
+        
+    </style>
+</head>
+<body x-data="{
+    sidebarOpen: true,
+    results: null,
+    personalityDescriptions: {
+        R: {
+            title: 'Realistic (Realistis)',
+            description: 'Menyukai pekerjaan praktis, mekanis, dan berorientasi pada aktivitas fisik. Memiliki keterampilan teknis yang baik.'
+        },
+        I: {
+            title: 'Investigative (Investigatif)',
+            description: 'Menyukai aktivitas analitis, intelektual, dan penelitian. Senang memecahkan masalah kompleks.'
+        },
+        A: {
+            title: 'Artistic (Artistik)',
+            description: 'Menyukai ekspresi kreatif, seni, musik, dan desain. Memiliki imajinasi yang kuat.'
+        },
+        S: {
+            title: 'Social (Sosial)',
+            description: 'Menyukai bekerja dengan orang lain, membantu, dan mengajar. Memiliki kemampuan interpersonal yang baik.'
+        },
+        E: {
+            title: 'Enterprising (Wirausaha)',
+            description: 'Menyukai memimpin, mempengaruhi orang lain, dan mengambil risiko. Berorientasi pada tujuan dan hasil.'
+        },
+        C: {
+            title: 'Conventional (Konvensional)',
+            description: 'Menyukai struktur, keteraturan, dan detail. Baik dalam mengorganisir dan mengikuti prosedur.'
+        }
+    },
+    getMaxScore() {
+        return Math.max(...Object.values(this.results.scores));
+    },
+    calculatePercentage(score) {
+        return (score / (5 * 3)) * 100; // 5 is max score, 3 questions per type
+    },
+    init() {
+        const savedResults = localStorage.getItem('riasecResults');
+        if (savedResults) {
+            this.results = JSON.parse(savedResults);
+        } else {
+            window.location.href = 'minatbakat.html';
+        }
+    }
+}" x-init="init">
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Add back button at the top -->
+        <div class="fixed top-8 left-8">
+            <a href="dash.html" 
+               class="px-6 py-3 bg-gray-600 text-white rounded-full shadow-lg hover:opacity-90 transition-all flex items-center gap-2 font-medium">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke Halaman Utama
+            </a>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">Hasil Tes RIASEC Anda</h1>
+            <p class="text-gray-600">Berikut adalah hasil analisis kepribadian karier Anda</p>
+        </div>
+
+        <!-- Main Results -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- Radar Chart -->
+            <div class="result-card p-6">
+                <h2 class="text-xl font-bold mb-4">Grafik RIASEC</h2>
+                <canvas id="riasecChart"></canvas>
+            </div>
+
+            <!-- Top 3 Types -->
+            <div class="result-card p-6">
+                <h2 class="text-xl font-bold mb-4">Tipe Kepribadian Dominan</h2>
+                <div class="space-y-4 personality-grid">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="font-semibold">Realistic</span>
+                        <span class="personality-tag">85%</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="font-semibold">Investigative</span>
+                        <span class="personality-tag">78%</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="font-semibold">Artistic</span>
+                        <span class="personality-tag">65%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Recommendations -->
+        <div class="result-card p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Rekomendasi Karier</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 recommendation-grid">
+                <div class="recommendation-card">
+                    <h3 class="font-semibold">Teknik Informatika</h3>
+                    <p class="text-sm text-gray-600">Kesesuaian: 95%</p>
+                </div>
+                <div class="recommendation-card">
+                    <h3 class="font-semibold">Sistem Informasi</h3>
+                    <p class="text-sm text-gray-600">Kesesuaian: 90%</p>
+                </div>
+                <div class="recommendation-card">
+                    <h3 class="font-semibold">Teknik Elektro</h3>
+                    <p class="text-sm text-gray-600">Kesesuaian: 85%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="result-card p-6">
+            <h2 class="text-xl font-bold mb-4">Interpretasi Hasil</h2>
+            <div class="prose max-w-none">
+                <p class="mb-4">
+                    Berdasarkan hasil tes, Anda memiliki kecenderungan kuat pada tipe Realistic. 
+                    Ini menunjukkan bahwa Anda lebih suka bekerja dengan benda, alat, mesin, atau hewan.
+                    Anda menyukai aktivitas yang praktis dan konkret.
+                </p>
+                <p>
+                    Kombinasi dengan tipe Investigative menunjukkan bahwa Anda juga memiliki
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keep only download button in bottom-right -->
+    <div class="fixed bottom-8 right-8">
+        <button onclick="generatePDF()" 
+                class="download-btn px-6 py-3 bg-gradient-to-r from-red-500 to-yellow-500 text-white rounded-full shadow-lg hover:opacity-90 transition-all flex items-center gap-2 font-medium">
+            <i class="fas fa-download"></i>
+            Download PDF
+        </button>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('riasecChart').getContext('2d');
+        const riasecChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Realistic', 'Investigative', 'Artistic', 'Social', 'Enterprising', 'Conventional'],
+                datasets: [{
+                    label: 'RIASEC',
+                    data: [85, 78, 65, 50, 45, 30],
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scale: {
+                    ticks: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        function generatePDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: [15, 15],
+                filename: 'Hasil-Tes-RIASEC.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: true,
+                    letterRendering: true,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: 'avoid-all' }
+            };
+
+            // Add loading state
+            const downloadBtn = document.querySelector('.download-btn');
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat PDF...';
+            downloadBtn.disabled = true;
+
+            // Generate PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                downloadBtn.disabled = false;
+            }).catch(err => {
+                console.error('PDF generation failed:', err);
+                downloadBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal membuat PDF';
+                setTimeout(() => {
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    downloadBtn.disabled = false;
+                }, 3000);
+            });
+        }
+
+        // Load and display results
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = JSON.parse(localStorage.getItem('riasecResults'));
+            if (results) {
+                updateChart(results.scores);
+                updateDominantTypes(results.scores);
+                updateRecommendations(results.scores);
+            }
+        });
+
+        // Add other necessary functions...
+        // Update chart and display functions
+        function updateChart(scores) {
+            const ctx = document.getElementById('riasecChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Realistic', 'Investigative', 'Artistic', 'Social', 'Enterprising', 'Conventional'],
+                    datasets: [{
+                        label: 'RIASEC Profile',
+                        data: [
+                            scores.R * 20, // Converting to percentage
+                            scores.I * 20,
+                            scores.A * 20,
+                            scores.S * 20,
+                            scores.E * 20,
+                            scores.C * 20
+                        ],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#4F46E5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDominantTypes(scores) {
+            const sortedTypes = Object.entries(scores)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 3);
+            
+            const dominantTypesDiv = document.querySelector('.personality-grid');
+            sortedTypes.forEach(([type, score]) => {
+                const percentage = Math.round((score / 15) * 100); // 15 is max possible score
+                const typeNames = {
+                    'R': 'Realistic',
+                    'I': 'Investigative',
+                    'A': 'Artistic',
+                    'S': 'Social',
+                    'E': 'Enterprising',
+                    'C': 'Conventional'
+                };
+                
+                dominantTypesDiv.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="font-semibold">${typeNames[type]}</span>
+                        <span class="personality-tag">${percentage}%</span>
+                    </div>
+                `;
+            });
+        }
+
+        function generatePDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 1,
+                filename: 'Hasil-Tes-RIASEC.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: true,
+                    letterRendering: true
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+
+            // Add loading state
+            const downloadBtn = document.querySelector('.download-btn');
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            downloadBtn.disabled = true;
+
+            // Generate PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                downloadBtn.disabled = false;
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = JSON.parse(localStorage.getItem('riasecResults'));
+            if (results) {
+                updateChart(results.scores);
+                updateDominantTypes(results.scores);
+                
+                // Update career recommendations
+                const recommendationsDiv = document.querySelector('.recommendation-grid');
+                results.careerSuggestions.forEach((career, index) => {
+                    const match = 95 - (index * 5); // Simple scoring logic
+                    recommendationsDiv.innerHTML += `
+                        <div class="recommendation-card">
+                            <h3 class="font-semibold">${career}</h3>
+                            <p class="text-sm text-gray-600">Kesesuaian: ${match}%</p>
+                        </div>
+                    `;
+                });
+            } else {
+                window.location.href = 'minatbakat.html';
+            }
+        });
+    </script>
+</body>
+</html>

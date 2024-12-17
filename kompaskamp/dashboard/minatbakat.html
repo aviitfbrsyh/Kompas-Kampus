@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes RIASEC - Kompas Kampus</title>
+    
+    <!-- Same dependencies as other pages -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="css/minatbakat.css">
+    
+    <style>
+        
+    </style>
+</head>
+<body x-data="{ 
+    showIntro: true,  // Add this new state
+    showTest: false,  // Add this new state
+    currentQuestion: 0,
+    totalQuestions: 15,
+    answers: Array(15).fill(null),
+    questions: [
+        {
+            id: 1,
+            text: 'Saya suka memperbaiki peralatan elektronik atau mekanik',
+            category: 'R'
+        },
+        {
+            id: 2,
+            text: 'Saya senang menganalisis data dan melakukan penelitian',
+            category: 'I'
+        },
+        {
+            id: 3,
+            text: 'Saya suka mengekspresikan diri melalui seni atau musik',
+            category: 'A'
+        },
+        {
+            id: 4,
+            text: 'Saya senang membantu dan mengajar orang lain',
+            category: 'S'
+        },
+        {
+            id: 5,
+            text: 'Saya suka memimpin dan mempengaruhi orang lain',
+            category: 'E'
+        },
+        {
+            id: 6,
+            text: 'Saya senang mengorganisir dan mengatur detail',
+            category: 'C'
+        },
+        {
+            id: 7,
+            text: 'Saya suka bekerja dengan alat dan mesin',
+            category: 'R'
+        },
+        {
+            id: 8,
+            text: 'Saya senang memecahkan masalah kompleks',
+            category: 'I'
+        },
+        {
+            id: 9,
+            text: 'Saya suka mendesain dan berkreasi',
+            category: 'A'
+        },
+        {
+            id: 10,
+            text: 'Saya senang bekerja dalam tim',
+            category: 'S'
+        },
+        {
+            id: 11,
+            text: 'Saya suka mengambil risiko dan bersaing',
+            category: 'E'
+        },
+        {
+            id: 12,
+            text: 'Saya senang mengikuti prosedur yang terstruktur',
+            category: 'C'
+        },
+        {
+            id: 13,
+            text: 'Saya suka aktivitas fisik dan outdoor',
+            category: 'R'
+        },
+        {
+            id: 14,
+            text: 'Saya senang belajar hal-hal baru',
+            category: 'I'
+        },
+        {
+            id: 15,
+            text: 'Saya suka mengekspresikan ide-ide kreatif',
+            category: 'A'
+        }
+    ],
+    scores: {
+        R: 0, I: 0, A: 0, S: 0, E: 0, C: 0
+    },
+    nextQuestion() {
+        if (this.answers[this.currentQuestion] !== null && this.currentQuestion < this.totalQuestions - 1) {
+            this.currentQuestion++;
+        }
+    },
+    submitAnswer(value) {
+        this.answers[this.currentQuestion] = value;
+        this.scores[this.questions[this.currentQuestion].category] += value;
+        
+        if (this.currentQuestion < this.totalQuestions - 1) {
+            this.currentQuestion++;
+        } else {
+            this.submitTest();
+        }
+    },
+    getPersonalityType() {
+        const sortedScores = Object.entries(this.scores)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 3)
+            .map(([type]) => type);
+        return sortedScores.join('');
+    },
+    
+    getCareerSuggestions(personalityType) {
+        const careers = {
+            'RIA': ['Teknisi', 'Insinyur', 'Peneliti', 'Arsitek'],
+            'RIE': ['Insinyur Sistem', 'Analisis Data', 'Manajer Teknis'],
+            'RSE': ['Kontraktor', 'Supervisor Produksi', 'Manajer Proyek'],
+            'ISA': ['Peneliti', 'Profesor', 'Psikolog', 'Konsultan'],
+            'IAS': ['Peneliti Medis', 'Desainer Sistem', 'Analis Bisnis'],
+            'AIS': ['Desainer', 'Pengembang Produk', 'Artis'],
+            'SIA': ['Konselor', 'Guru', 'Pekerja Sosial'],
+            'SEA': ['Manajer SDM', 'Pelatih', 'Konsultan'],
+            'EIA': ['Pengusaha', 'Manajer Proyek', 'Konsultan Bisnis'],
+            'EAS': ['Manajer Pemasaran', 'Manajer Penjualan', 'Manajer Produk'],
+            'CIS': ['Akuntan', 'Analis Keuangan', 'Manajer Proyek'],
+            'CES': ['Administrator', 'Manajer Operasional', 'Manajer Proyek']
+        };
+        return careers[personalityType] || [];
+    },
+    submitTest() {
+        const personalityType = this.getPersonalityType();
+        const careerSuggestions = this.getCareerSuggestions(personalityType);
+        const results = {
+            scores: this.scores,
+            answers: this.answers,
+            personalityType: personalityType,
+            careerSuggestions: careerSuggestions,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('riasecResults', JSON.stringify(results));
+        window.location.href = 'riasec-result.html';
+    }
+}">
+    <!-- Introduction Screen -->
+    <div x-show="showIntro" class="fixed inset-0 z-50 bg-white overflow-auto">
+        <div class="min-h-screen p-6 flex items-center justify-center">
+            <div class="max-w-2xl w-full mx-auto">
+                <!-- Header Section - Reduced sizes -->
+                <div class="text-center mb-8">
+                    <img src="logohet.jpg" alt="Logo" class="h-16 w-16 mx-auto mb-4 rounded-xl shadow-md">
+                    <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+                        Tes Minat Bakat RIASEC
+                    </h1>
+                    <p class="text-sm text-gray-600">Temukan potensi dan jalur karier terbaikmu</p>
+                </div>
+
+                <!-- Guide Section - More compact -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 text-center">Panduan Tes Minat Bakat</h2>
+                    
+                    <div class="grid gap-4 max-w-xl mx-auto">
+                        <!-- Guide Items - Reduced spacing -->
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                1
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900 mb-1">Ikuti Intuisi Pertama</h3>
+                                <p class="text-gray-600 text-sm">Jawablah dengan spontan—seringkali intuisi pertamamu adalah yang paling sesuai dengan dirimu</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                2
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900 mb-1">Kejujuran adalah Kunci</h3>
+                                <p class="text-gray-600 text-sm">Tidak ada jawaban yang benar atau salah. Jawablah dengan jujur sesuai kepribadianmu.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                3
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900 mb-1">Atur Waktumu Sendiri</h3>
+                                <p class="text-gray-600 text-sm">Kamu bebas menentukan ritme—tidak ada batasan waktu dalam mengerjakan tes ini.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                4
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900 mb-1">Komitmen Hingga Akhir</h3>
+                                <p class="text-gray-600 text-sm">Tes ini terdiri dari 15 pertanyaan. Pastikan kamu menyelesaikan semua pertanyaan untuk hasil yang akurat.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start Button - Slightly smaller -->
+                    <div class="flex justify-center mt-8">
+                        <button @click="showIntro = false; showTest = true" 
+                                class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold text-base hover:opacity-90 transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2">
+                            <span>Mulai Tes</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Content -->
+    <div x-show="showTest">
+        <!-- Existing header -->
+        <header class="modern-header fixed w-full z-50">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-4">
+                        <img src="logohet.jpg" alt="Logo" class="h-10 w-10 rounded-xl">
+                        <div>
+                            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                                Tes Minat Bakat
+                            </h1>
+                            <p class="text-sm text-gray-600">Temukan Jalur Kariermu</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <div class="hidden md:flex items-center space-x-2">
+                            <span class="text-sm text-gray-600">Progres:</span>
+                            <span class="font-semibold text-indigo-600" x-text="`${Math.round((currentQuestion / totalQuestions) * 100)}%`"></span>
+                        </div>
+                        <button @click="$dispatch('show-exit-modal')" 
+                                class="text-gray-600 hover:text-red-600 transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Existing main content -->
+        <main class="modern-container">
+            <div class="modern-card p-8">
+                <!-- Progress Bar -->
+                <div class="progress-bar">
+                    <div class="progress-fill" :style="`width: ${(currentQuestion / totalQuestions) * 100}%`"></div>
+                </div>
+
+                <!-- Question Content -->
+                <div class="pt-8">
+                    <span class="text-sm font-medium text-indigo-600" x-text="`Pertanyaan ${currentQuestion + 1} dari ${totalQuestions}`"></span>
+                    <h2 class="text-2xl font-bold mt-2 mb-8" x-text="questions[currentQuestion].text"></h2>
+                    
+                    <!-- Modern Options Grid -->
+                    <div class="modern-options">
+                        <template x-for="score in [1,2,3,4,5]">
+                            <button @click="submitAnswer(score)"
+                                    class="modern-option"
+                                    :class="{'selected': answers[currentQuestion] === score}">
+                                <span class="text-2xl font-bold" x-text="score"></span>
+                                <span class="text-sm" 
+                                      x-text="score === 1 ? 'Sangat Tidak Setuju' : 
+                                              score === 2 ? 'Tidak Setuju' :
+                                              score === 3 ? 'Netral' :
+                                              score === 4 ? 'Setuju' : 'Sangat Setuju'">
+                                </span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Existing footer -->
+        <footer class="modern-footer">
+            <button x-show="currentQuestion > 0"
+                    @click="currentQuestion--"
+                    class="px-6 py-2 text-gray-600 hover:text-gray-800 flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i>
+                <span>Sebelumnya</span>
+            </button>
+            
+            <div class="flex items-center gap-4">
+                <button x-show="currentQuestion < totalQuestions - 1"
+                        @click="nextQuestion()"
+                        class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                    <span>Selanjutnya</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <button x-show="currentQuestion === totalQuestions - 1"
+                        @click="submitTest()"
+                        class="px-6 py-2 bg-gradient-to-r from-red-500 to-yellow-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                    <span>Selesai</span>
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Exit Confirmation Modal -->
+    <div x-show="false" 
+         @show-exit-modal.window="$el.classList.remove('hidden')"
+         class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full animate-slide-in">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Keluar dari Tes?</h3>
+            <p class="text-gray-600 mb-6">
+                Progres Anda akan hilang jika keluar sekarang. Anda yakin ingin keluar?
+            </p>
+            <div class="grid grid-cols-2 gap-4">
+                <button @click="$el.closest('div').classList.add('hidden')"
+                        class="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">
+                    Lanjutkan Tes
+                </button>
+                <a href="dashboard.html"
+                   class="px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 text-center">
+                    Keluar
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
